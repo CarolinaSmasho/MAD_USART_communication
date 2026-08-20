@@ -92,6 +92,7 @@ void read_line_from_keyboard(void)
   kb_idx = 0;
   kb_ready = 0;
   __enable_irq();
+  HAL_UART_Receive_IT(&huart3, &rx3_byte, 1);
   while (!kb_ready)
   {
   }
@@ -103,6 +104,7 @@ void wait_remote_line(void)
   remote_idx = 0;
   remote_ready = 0;
   __enable_irq();
+  HAL_UART_Receive_IT(&huart6, &rx6_byte, 1);
   while (!remote_ready && !chat_ended)
   {
   }
