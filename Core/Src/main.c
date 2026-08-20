@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define IS_UART1 1
+#define IS_UART1 0
 
 #define BUF_SIZE 128
 #define NAME_SIZE 32
@@ -88,8 +88,10 @@ void send_line(UART_HandleTypeDef *huart, const char *s)
 
 void read_line_from_keyboard(void)
 {
+  __disable_irq();
   kb_idx = 0;
   kb_ready = 0;
+  __enable_irq();
   while (!kb_ready)
   {
   }
@@ -97,8 +99,10 @@ void read_line_from_keyboard(void)
 
 void wait_remote_line(void)
 {
+  __disable_irq();
   remote_idx = 0;
   remote_ready = 0;
+  __enable_irq();
   while (!remote_ready && !chat_ended)
   {
   }
@@ -141,7 +145,6 @@ int main(void)
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &rx3_byte, 1);
-  HAL_UART_Receive_IT(&huart6, &rx6_byte, 1);
 
 #if IS_UART1
   send_line(&huart3, "Man from U.A.R.T.1!");
@@ -160,6 +163,7 @@ int main(void)
   send_str(&huart6, my_name);
   send_str(&huart6, "\r");
 
+  HAL_UART_Receive_IT(&huart6, &rx6_byte, 1);
   wait_remote_line();
   memcpy(other_name, remote_buf, remote_idx);
   other_name[remote_idx] = '\0';
@@ -170,6 +174,7 @@ int main(void)
 
   my_turn = 1;
 #else
+  HAL_UART_Receive_IT(&huart6, &rx6_byte, 1);
   wait_remote_line();
   memcpy(other_name, remote_buf, remote_idx);
   other_name[remote_idx] = '\0';
