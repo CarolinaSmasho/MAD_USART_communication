@@ -315,6 +315,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
       kb_ready = 1;
     }
+    else if (rx3_byte == 0x08 || rx3_byte == 0x7F)
+    {
+      if (kb_idx > 0)
+      {
+        kb_idx--;
+        uint8_t bs[] = {0x08, ' ', 0x08};
+        HAL_UART_Transmit(&huart3, bs, 3, HAL_MAX_DELAY);
+      }
+    }
     else
     {
       HAL_UART_Transmit(&huart3, &rx3_byte, 1, HAL_MAX_DELAY);
